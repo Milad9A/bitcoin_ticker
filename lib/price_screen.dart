@@ -10,6 +10,9 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
+  var bTC_rate;
+  var eTH_rate;
+  var lTC_rate;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -24,8 +27,9 @@ class _PriceScreenState extends State<PriceScreen> {
     return DropdownButton<String>(
       value: selectedCurrency,
       items: dropdownItems,
-      onChanged: (value) {
+      onChanged: (value) async {
         setState(() {
+          getData();
           selectedCurrency = value;
         });
       },
@@ -46,6 +50,35 @@ class _PriceScreenState extends State<PriceScreen> {
       },
       children: pickerItems,
     );
+  }
+
+  //TODO: Create a method here called getData() to get the coin data from coin_data.dart
+  void getData() async {
+    CoinData coinData = CoinData();
+    var bTC = await coinData.getCoinData(selectedCurrency, 'BTC');
+    var eTH = await coinData.getCoinData(selectedCurrency, 'ETH');
+    var lTC = await coinData.getCoinData(selectedCurrency, 'LTC');
+    setState(() {
+      if (bTC == null || eTH == null || lTC == null) {
+        bTC_rate = '?';
+        eTH_rate = '?';
+        lTC_rate = '?';
+        return;
+      }
+      bTC_rate = bTC['rate'];
+      eTH_rate = eTH['rate'];
+      lTC_rate = lTC['rate'];
+      bTC_rate = bTC_rate.round();
+      eTH_rate = eTH_rate.round();
+      lTC_rate = lTC_rate.round();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //TODO: Call getData() when the screen loads up.
+    getData();
   }
 
   @override
@@ -69,7 +102,50 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  //TODO: Update the Text Widget with the live bitcoin data here.
+                  '1 BTC = $bTC_rate $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 ETH = $eTH_rate $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 LTC = $lTC_rate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
